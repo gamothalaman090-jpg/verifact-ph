@@ -1,31 +1,132 @@
+/* ─────────────────────────────────────────────
+ * VERIFACT — "Ink & Verdict" Design System
+ * Editorial Brutalism
+ * ───────────────────────────────────────────── */
+
 @import "tailwindcss";
 
-@theme {
-  --color-ink-black: #0f172a;
-  --color-newsprint-white: #f8fafc;
-  --color-highlighter-yellow: #fef08a;
+/* ── Google Fonts ── */
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700;800&family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=JetBrains+Mono:wght@300;400;500;600&display=swap');
 
-  --font-serif: "Playfair Display", "Merriweather", serif;
-  --font-mono: "Space Grotesk", "JetBrains Mono", monospace;
+/* ── Tailwind 4 Theme Tokens ── */
+@theme {
+  /* Color system — "Ink & Verdict" */
+  --color-void: #050505;
+  --color-ink-black: #0a0a0a;
+  --color-newsprint: #e8e6e1;
+  --color-newsprint-dim: #6b6b6b;
+  --color-verdict-yellow: #f0e130;
+  --color-verdict-yellow-dim: rgba(240, 225, 48, 0.15);
+  --color-blood-red: #c0392b;
+  --color-safe-green: #27ae60;
+
+  /* Typography */
+  --font-display: "Space Grotesk", sans-serif;
+  --font-serif: "Playfair Display", Georgia, serif;
+  --font-mono: "JetBrains Mono", "Fira Code", monospace;
+}
+
+/* ── Base ── */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  width: 100%;
+  scroll-behavior: auto; /* Lenis handles smooth scroll */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
 }
 
 body {
-  background-color: var(--color-ink-black);
-  color: var(--color-newsprint-white);
+  width: 100%;
+  background-color: var(--color-void);
+  color: var(--color-newsprint);
   font-family: var(--font-mono);
   overflow-x: hidden;
-  margin: 0;
-  padding: 0;
+  line-height: 1.6;
+}
+
+#root {
+  width: 100%;
+  display: block;
+}
+
+/* ── Selection ── */
+::selection {
+  background-color: var(--color-verdict-yellow);
+  color: var(--color-ink-black);
+}
+
+/* ── Scrollbar ── */
+::-webkit-scrollbar {
+  width: 6px;
+}
+::-webkit-scrollbar-track {
+  background: var(--color-void);
+}
+::-webkit-scrollbar-thumb {
+  background: #1a1a1a;
+  border-radius: 0;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-verdict-yellow);
+}
+
+/* ── Newsprint Grain Texture Overlay ── */
+.grain-overlay {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 9999;
+  opacity: 0.03;
+  mix-blend-mode: overlay;
+  filter: grayscale(1);
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='1'/%3E%3C/svg%3E");
+  background-repeat: repeat;
+  background-size: 256px 256px;
+}
+
+/* ── Font utility classes ── */
+.font-display {
+  font-family: var(--font-display);
 }
 
 .font-serif {
   font-family: var(--font-serif);
 }
 
-.text-highlighter-yellow {
-  color: var(--color-highlighter-yellow);
+/* ── Animate-in utility ── */
+@keyframes fadeSlideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
-.bg-highlighter-yellow {
-  background-color: var(--color-highlighter-yellow);
-  color: var(--color-ink-black);
+
+.animate-in {
+  animation: fadeSlideUp 0.6s ease-out forwards;
+}
+
+/* ── Focus styles (accessibility) ── */
+:focus-visible {
+  outline: 2px solid var(--color-verdict-yellow);
+  outline-offset: 2px;
+}
+
+/* ── Responsive canvas sizing ── */
+@media (max-width: 768px) {
+  canvas {
+    max-width: min(92vw, 400px) !important;
+    max-height: min(75vh, 600px) !important;
+  }
 }
