@@ -4,7 +4,7 @@
 
 import { useState, useRef } from 'react';
 import {
-  Search, AlertTriangle, CheckCircle, Loader2,
+  Search, AlertTriangle, Loader2,
   ExternalLink, Globe, Shield, ShieldAlert, ShieldX,
   ShieldCheck, Newspaper, ChevronDown, ChevronUp,
 } from 'lucide-react';
