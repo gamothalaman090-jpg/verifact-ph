@@ -10,7 +10,7 @@ for name, text in tests:
     print(f"\n{'='*60}")
     print(f"TEST: {name}")
     print(f"{'='*60}")
-    r = httpx.post("http://localhost:8000/analyze", json={"text": text}, timeout=60)
+    r = httpx.post("https://verifact-ph-production.up.railway.app/analyze", json={"text": text}, timeout=60)
     d = r.json()
     print(f"  Verdict:    {d['verdict']}")
     print(f"  Score:      {d['verdict_score']}")

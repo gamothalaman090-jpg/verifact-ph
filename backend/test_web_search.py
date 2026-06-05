@@ -5,7 +5,7 @@ print("Testing VeriFact /search Endpoint...")
 try:
     # 1. Test query that can be answered by the web search engine
     payload = {"query": "Who is the current president of the Philippines?"}
-    r = httpx.post("http://localhost:8000/search", json=payload, timeout=60.0)
+    r = httpx.post("https://verifact-ph-production.up.railway.app/search", json=payload, timeout=60.0)
     print(f"Status Code: {r.status_code}")
     if r.status_code == 200:
         data = r.json()
