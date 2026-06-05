@@ -26,6 +26,18 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+@app.get("/health")
+async def health_check():
+    import os
+    gemini_key = os.getenv("GEMINI_API_KEY", "")
+    google_key = os.getenv("GOOGLE_FACT_CHECK_API_KEY", "")
+    return {
+        "status": "ok",
+        "gemini_key_loaded": bool(gemini_key),
+        "gemini_key_preview": gemini_key[:6] + "..." if gemini_key else "NOT SET",
+        "google_key_loaded": bool(google_key),
+    }
+
 class ArticleRequest(BaseModel):
     text: str
 
