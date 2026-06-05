@@ -38,6 +38,22 @@ async def health_check():
         "google_key_loaded": bool(google_key),
     }
 
+@app.get("/test-gemini")
+async def test_gemini():
+    """Quick diagnostic: send a trivial prompt to Gemini and report what happens."""
+    import os, httpx
+    key = os.getenv("GEMINI_API_KEY", "")
+    if not key:
+        return {"error": "GEMINI_API_KEY not set"}
+    url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent"
+    payload = {"contents": [{"parts": [{"text": "Reply with the single word: hello"}]}]}
+    try:
+        async with httpx.AsyncClient(timeout=30.0) as client:
+            resp = await client.post(f"{url}?key={key}", json=payload)
+        return {"status_code": resp.status_code, "body": resp.json()}
+    except Exception as e:
+        return {"error": str(e)}
+
 class ArticleRequest(BaseModel):
     text: str
 
