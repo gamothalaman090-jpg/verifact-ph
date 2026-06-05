@@ -8,11 +8,8 @@ Falls back gracefully if the API is unavailable.
 import os
 import json
 import httpx
-from dotenv import load_dotenv
 
-load_dotenv()
-
-GEMINI_API_KEY = os.getenv("GEMINI_API_KEY") or os.getenv("GOOGLE_FACT_CHECK_API_KEY", "")
+GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "")
 GEMINI_MODEL = "gemini-2.5-flash"
 GEMINI_URL = f"https://generativelanguage.googleapis.com/v1beta/models/{GEMINI_MODEL}:generateContent"
 
@@ -159,7 +156,7 @@ async def synthesize_verdict_with_gemini(
     Returns None if the API is unavailable or fails.
     """
     if not GEMINI_API_KEY:
-        print("[WARN] No API key configured for Gemini. Using fallback engine.")
+        print("[WARN] No GEMINI_API_KEY configured. Using fallback engine.")
         return None
 
     prompt = _build_evidence_prompt(
@@ -192,7 +189,7 @@ async def synthesize_verdict_with_gemini(
             )
 
             if response.status_code == 403:
-                print("[WARN] Gemini API returned 403. API may not be enabled. Using fallback engine.")
+                print("[WARN] Gemini API returned 403. API may not be enabled in Google Cloud. Using fallback engine.")
                 return None
 
             response.raise_for_status()
@@ -246,3 +243,4 @@ async def synthesize_verdict_with_gemini(
     except Exception as e:
         print(f"[WARN] Gemini API error: {e}")
         return None
+
