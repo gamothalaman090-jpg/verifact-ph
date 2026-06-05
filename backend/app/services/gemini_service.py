@@ -115,6 +115,7 @@ ANALYSIS INSTRUCTIONS:
 - If evidence conflicts across sources, explain the conflict clearly
 - Be conservative: only mark as VERIFIED if strong evidence explicitly supports it
 - If no substantial evidence is found, mark as UNVERIFIED (not FALSE)
+- You have access to Google Search. If the evidence above is insufficient or the claim covers recent events not in the sources, USE YOUR WEB SEARCH TOOL to find additional information before deciding.
 
 RESPOND WITH ONLY THIS JSON (no markdown fences, no extra text):
 {{
@@ -176,11 +177,13 @@ async def synthesize_verdict_with_gemini(
         "contents": [
             {"parts": [{"text": prompt}]}
         ],
+        "tools": [
+            {"googleSearch": {}}
+        ],
         "generationConfig": {
             "temperature": 0.2,
             "topP": 0.8,
             "maxOutputTokens": 1024,
-            "responseMimeType": "application/json",
         },
     }
 
@@ -242,11 +245,32 @@ async def synthesize_verdict_with_gemini(
             confidence = 0.5
         confidence = max(0.0, min(1.0, float(confidence)))
 
+        # ── Parse grounding metadata (web sources Gemini searched) ──
+        web_sources = []
+        candidate = candidates[0]
+        grounding = candidate.get("groundingMetadata", {})
+        if grounding:
+            seen_urls = set()
+            for chunk in grounding.get("groundingChunks", []):
+                web = chunk.get("web", {})
+                url = web.get("uri", "")
+                title = web.get("title", "")
+                if url and url not in seen_urls:
+                    seen_urls.add(url)
+                    if not title:
+                        from urllib.parse import urlparse
+                        title = urlparse(url).netloc.replace("www.", "")
+                    web_sources.append({"title": title, "url": url})
+            search_queries = grounding.get("webSearchQueries", [])
+            if search_queries:
+                print(f"[INFO] Gemini searched the web with queries: {search_queries}")
+
         return {
             "verdict": verdict,
             "confidence_score": round(confidence, 3),
             "explanation": result.get("explanation", "AI analysis completed but no explanation was provided."),
             "evidence_analysis": result.get("evidence_analysis", []),
+            "web_sources": web_sources,
             "engine": "gemini",
         }
 
@@ -259,4 +283,5 @@ async def synthesize_verdict_with_gemini(
     except Exception as e:
         print(f"[WARN] Gemini API error ({type(e).__name__}): {e}")
         return None
+
 

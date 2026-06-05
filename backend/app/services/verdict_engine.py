@@ -238,6 +238,7 @@ async def compute_verdict(
             "verdict_color": VERDICT_COLORS.get(verdict, "yellow"),
             "explanation": gemini_result.get("explanation", ""),
             "evidence_analysis": gemini_result.get("evidence_analysis", []),
+            "web_sources": gemini_result.get("web_sources", []),
             "engine": "gemini",
 
             # Evidence breakdown (kept for backwards compatibility)

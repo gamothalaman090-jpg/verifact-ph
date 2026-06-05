@@ -137,9 +137,12 @@ async def analyze_article(payload: ArticleRequest):
         "explanation": verdict.get("explanation", ""),
         "evidence_analysis": verdict.get("evidence_analysis", []),
         "engine": verdict.get("engine", "fallback"),
+        "web_sources": verdict.get("web_sources", []),
     }
 
     if source_info:
         response["source"] = source_info
 
     return response
+
+

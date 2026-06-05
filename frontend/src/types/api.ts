@@ -72,6 +72,11 @@ export interface EvidenceBreakdown {
   };
 }
 
+export interface WebSearchSource {
+  title: string;
+  url: string;
+}
+
 export interface AnalysisResponse {
   verdict: string;
   verdict_score: number;
@@ -81,6 +86,7 @@ export interface AnalysisResponse {
   explanation?: string;
   evidence_analysis?: EvidenceAnalysis[];
   engine?: 'gemini' | 'fallback';
+  web_sources?: WebSearchSource[];
 }
 
 export interface AnalysisError {
@@ -92,3 +98,4 @@ export type AnalysisResult = AnalysisResponse | AnalysisError;
 export function isAnalysisError(result: AnalysisResult): result is AnalysisError {
   return 'error' in result;
 }
+

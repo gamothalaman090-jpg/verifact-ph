@@ -6,7 +6,7 @@ import { useState, useRef } from 'react';
 import {
   Search, AlertTriangle, Loader2,
   ExternalLink, Globe, Shield, ShieldAlert, ShieldX,
-  ShieldCheck, Newspaper, ChevronDown, ChevronUp,
+  ShieldCheck, Newspaper, ChevronDown, ChevronUp, Sparkles,
 } from 'lucide-react';
 import type { AnalysisResult, AnalysisResponse } from '../types/api';
 import { isAnalysisError } from '../types/api';
@@ -599,6 +599,73 @@ export default function AnalyzerSection() {
                 </>
               )}
 
+              {/* Web Search Grounding */}
+              {prediction.web_sources && prediction.web_sources.length > 0 && (
+                <>
+                  <div style={{ height: '1px', background: '#1a1a1a', marginBottom: '28px', marginTop: '28px' }} />
+
+                  <div style={{ marginBottom: '28px' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '12px' }}>
+                      <Sparkles style={{ width: '14px', height: '14px', color: 'var(--color-verdict-yellow)' }} />
+                      <span style={{ fontFamily: 'var(--font-mono)', fontSize: '11px', color: 'var(--color-newsprint)', fontWeight: 600 }}>
+                        AI Web Search Grounding
+                      </span>
+                      <span style={{
+                        fontFamily: 'var(--font-mono)',
+                        fontSize: '9px',
+                        padding: '2px 6px',
+                        background: 'rgba(240,225,48,0.1)',
+                        color: 'var(--color-verdict-yellow)',
+                        border: '1px solid rgba(240,225,48,0.2)',
+                        borderRadius: '2px',
+                        marginLeft: 'auto',
+                      }}>
+                        Live Search
+                      </span>
+                    </div>
+                    <p style={{ fontFamily: 'var(--font-mono)', fontSize: '12px', color: 'var(--color-newsprint-dim)', marginBottom: '12px' }}>
+                      Gemini searched the web to supplement analysis with {prediction.web_sources.length} source{prediction.web_sources.length !== 1 ? 's' : ''}
+                    </p>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                      {prediction.web_sources.map((src, i) => (
+                        <a
+                          key={i}
+                          href={src.url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          style={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '10px',
+                            borderLeft: '2px solid rgba(240,225,48,0.25)',
+                            paddingLeft: '14px',
+                            paddingTop: '6px',
+                            paddingBottom: '6px',
+                            textDecoration: 'none',
+                            transition: 'border-color 0.2s',
+                          }}
+                          onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.borderColor = 'var(--color-verdict-yellow)'; }}
+                          onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.borderColor = 'rgba(240,225,48,0.25)'; }}
+                        >
+                          <Globe style={{ width: '12px', height: '12px', color: '#555', flexShrink: 0 }} />
+                          <span style={{
+                            fontFamily: 'var(--font-mono)',
+                            fontSize: '12px',
+                            color: 'var(--color-newsprint)',
+                            overflow: 'hidden',
+                            textOverflow: 'ellipsis',
+                            whiteSpace: 'nowrap',
+                            flex: 1,
+                          }}>
+                            {src.title}
+                          </span>
+                          <ExternalLink style={{ width: '10px', height: '10px', color: verdictColor, flexShrink: 0 }} />
+                        </a>
+                      ))}
+                    </div>
+                  </div>
+                </>
+              )}
 
 
             </div>
