@@ -7,6 +7,7 @@ Falls back gracefully if the API is unavailable.
 
 import os
 import json
+import time
 import httpx
 
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "")
@@ -181,19 +182,28 @@ async def synthesize_verdict_with_gemini(
     }
 
     try:
-        async with httpx.AsyncClient(timeout=30.0) as client:
+        t_start = time.monotonic()
+        async with httpx.AsyncClient(timeout=60.0) as client:
             response = await client.post(
                 f"{GEMINI_URL}?key={GEMINI_API_KEY}",
                 json=payload,
                 headers={"Content-Type": "application/json"},
             )
 
-            if response.status_code == 403:
-                print("[WARN] Gemini API returned 403. API may not be enabled in Google Cloud. Using fallback engine.")
-                return None
+        elapsed = time.monotonic() - t_start
+        print(f"[INFO] Gemini API responded in {elapsed:.2f}s (status {response.status_code})")
 
-            response.raise_for_status()
-            data = response.json()
+        if response.status_code == 403:
+            print("[WARN] Gemini API returned 403. API may not be enabled in Google Cloud. Using fallback engine.")
+            return None
+
+        if response.status_code == 429:
+            print("[WARN] Gemini API returned 429 (rate limit / quota exhausted). Using fallback engine.")
+            return None
+
+        response.raise_for_status()
+        data = response.json()
+
 
         # Extract the generated text
         candidates = data.get("candidates", [])
@@ -240,7 +250,10 @@ async def synthesize_verdict_with_gemini(
     except json.JSONDecodeError as e:
         print(f"[WARN] Failed to parse Gemini JSON response: {e}")
         return None
+    except httpx.TimeoutException as e:
+        print(f"[WARN] Gemini API request timed out after 60s: {type(e).__name__}: {e}")
+        return None
     except Exception as e:
-        print(f"[WARN] Gemini API error: {e}")
+        print(f"[WARN] Gemini API error ({type(e).__name__}): {e}")
         return None
 
