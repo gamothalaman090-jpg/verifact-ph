@@ -44,7 +44,8 @@ export default function AnalyzerSection() {
     setShowSources(false);
 
     try {
-      const res = await fetch('http://localhost:8000/analyze', {
+      const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:8000';
+      const res = await fetch(`${apiUrl}/analyze`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ text }),
@@ -282,6 +283,127 @@ export default function AnalyzerSection() {
               </div>
             </div>
 
+            {/* AI Analysis / Accuracy Explanation (New Card) */}
+            {prediction.explanation && (
+              <div style={{
+                padding: '40px',
+                background: '#0e0e0e',
+                borderBottom: '1px solid #1a1a1a',
+              }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '16px' }}>
+                  <span style={{
+                    fontFamily: 'var(--font-mono)',
+                    fontSize: '10px',
+                    letterSpacing: '0.2em',
+                    color: 'var(--color-verdict-yellow)',
+                    textTransform: 'uppercase',
+                  }}>
+                    {prediction.engine === 'gemini' ? 'AI Verdict Analysis' : 'Rule-Based Analysis'}
+                  </span>
+                  {prediction.engine === 'gemini' && (
+                    <span style={{
+                      fontFamily: 'var(--font-mono)',
+                      fontSize: '9px',
+                      padding: '2px 6px',
+                      background: 'rgba(240,225,48,0.1)',
+                      color: 'var(--color-verdict-yellow)',
+                      border: '1px solid rgba(240,225,48,0.2)',
+                      borderRadius: '2px',
+                    }}>
+                      Gemini 2.5
+                    </span>
+                  )}
+                </div>
+
+                <p style={{
+                  fontFamily: 'var(--font-serif)',
+                  fontSize: '17px',
+                  lineHeight: '1.6',
+                  color: 'var(--color-newsprint)',
+                  marginBottom: '32px',
+                  fontStyle: 'italic',
+                }}>
+                  "{prediction.explanation}"
+                </p>
+
+                {/* Per-source analysis breakdown */}
+                {prediction.evidence_analysis && prediction.evidence_analysis.length > 0 && (
+                  <div>
+                    <span style={{
+                      display: 'block',
+                      fontFamily: 'var(--font-mono)',
+                      fontSize: '10px',
+                      letterSpacing: '0.15em',
+                      color: 'var(--color-newsprint-dim)',
+                      textTransform: 'uppercase',
+                      marginBottom: '16px',
+                    }}>
+                      Source Reliability Breakdown
+                    </span>
+
+                    <div style={{
+                      display: 'grid',
+                      gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
+                      gap: '16px',
+                    }}>
+                      {prediction.evidence_analysis.map((item, idx) => {
+                        const impactColors = {
+                          positive: { border: '#2ecc7130', bg: '#2ecc7106', text: '#2ecc71' },
+                          negative: { border: '#c0392b30', bg: '#c0392b06', text: '#c0392b' },
+                          neutral: { border: '#88888830', bg: '#88888806', text: '#888888' },
+                          unavailable: { border: '#33333330', bg: '#11111103', text: '#555555' },
+                        };
+                        const currentStyle = impactColors[item.impact] || impactColors.neutral;
+
+                        return (
+                          <div
+                            key={idx}
+                            style={{
+                              border: `1px solid ${currentStyle.border}`,
+                              background: currentStyle.bg,
+                              padding: '16px',
+                              borderRadius: '4px',
+                              display: 'flex',
+                              flexDirection: 'column',
+                              gap: '8px',
+                            }}
+                          >
+                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                              <span style={{
+                                fontFamily: 'var(--font-mono)',
+                                fontSize: '11px',
+                                fontWeight: 600,
+                                color: 'var(--color-newsprint)',
+                              }}>
+                                {item.source}
+                              </span>
+                              <span style={{
+                                fontFamily: 'var(--font-mono)',
+                                fontSize: '8px',
+                                letterSpacing: '0.1em',
+                                textTransform: 'uppercase',
+                                color: currentStyle.text,
+                              }}>
+                                {item.impact}
+                              </span>
+                            </div>
+                            <p style={{
+                              fontFamily: 'var(--font-mono)',
+                              fontSize: '12px',
+                              lineHeight: '1.4',
+                              color: 'var(--color-newsprint-dim)',
+                            }}>
+                              {item.finding}
+                            </p>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
+
             {/* Evidence Section */}
             <div style={{ padding: '32px 40px' }}>
               <span style={{
@@ -428,6 +550,54 @@ export default function AnalyzerSection() {
                   </>
                 )}
               </div>
+
+              {/* Wikipedia references */}
+              {prediction.evidence.wikipedia && (
+                <>
+                  <div style={{ height: '1px', background: '#1a1a1a', marginBottom: '28px', marginTop: '28px' }} />
+
+                  <div style={{ marginBottom: '28px' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '12px' }}>
+                      <Globe style={{ width: '14px', height: '14px', color: '#888' }} />
+                      <span style={{ fontFamily: 'var(--font-mono)', fontSize: '11px', color: 'var(--color-newsprint)', fontWeight: 600 }}>
+                        Wikipedia Knowledge Reference
+                      </span>
+                      {prediction.evidence.wikipedia.search_terms && (
+                        <span style={{ fontFamily: 'var(--font-mono)', fontSize: '9px', color: '#555', marginLeft: 'auto' }}>
+                          Query: {prediction.evidence.wikipedia.search_terms}
+                        </span>
+                      )}
+                    </div>
+
+                    {prediction.evidence.wikipedia.has_results ? (
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                        {prediction.evidence.wikipedia.articles.map((art, i) => (
+                          <div key={i} style={{ borderLeft: '2px solid rgba(240,225,48,0.2)', paddingLeft: '14px' }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
+                              <span style={{ fontFamily: 'var(--font-mono)', fontSize: '12px', color: 'var(--color-newsprint)', fontWeight: 600 }}>
+                                {art.title}
+                              </span>
+                              <a href={art.url} target="_blank" rel="noopener noreferrer" style={{
+                                fontFamily: 'var(--font-mono)', fontSize: '9px', color: verdictColor, textDecoration: 'none',
+                                display: 'inline-flex', alignItems: 'center', gap: '3px',
+                              }}>
+                                <ExternalLink style={{ width: '9px', height: '9px' }} /> Read
+                              </a>
+                            </div>
+                            <p style={{ fontFamily: 'var(--font-mono)', fontSize: '12px', color: 'var(--color-newsprint-dim)', lineHeight: 1.5 }}>
+                              {art.snippet}
+                            </p>
+                          </div>
+                        ))}
+                      </div>
+                    ) : (
+                      <p style={{ fontFamily: 'var(--font-mono)', fontSize: '12px', color: '#555', fontStyle: 'italic' }}>
+                        No relevant Wikipedia articles were found.
+                      </p>
+                    )}
+                  </div>
+                </>
+              )}
 
 
 

@@ -14,13 +14,13 @@ const steps = [
   {
     num: '02',
     title: 'ANALYZE',
-    description: 'A fine-tuned RoBERTa transformer cross-references linguistic patterns against verified datasets.',
+    description: 'A parallel pipeline queries global fact-check databases, live news feeds, and Wikipedia in real time.',
     Icon: Cpu,
   },
   {
     num: '03',
     title: 'VERDICT',
-    description: 'Receive a confidence-scored prediction, verified against Google Fact Check Tools API.',
+    description: 'Receive an AI-synthesized verdict from Google Gemini, complete with a confidence score and detailed evidence analysis.',
     Icon: ShieldCheck,
   },
 ] as const;

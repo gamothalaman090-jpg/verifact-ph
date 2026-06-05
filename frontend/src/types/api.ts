@@ -31,6 +31,19 @@ export interface CorroborationSource {
   type: string;
 }
 
+export interface WikipediaArticle {
+  title: string;
+  snippet: string;
+  url: string;
+  timestamp: string;
+}
+
+export interface EvidenceAnalysis {
+  source: string;
+  finding: string;
+  impact: 'positive' | 'negative' | 'neutral' | 'unavailable';
+}
+
 export interface EvidenceBreakdown {
   factcheck: {
     score: number;
@@ -47,11 +60,15 @@ export interface EvidenceBreakdown {
     weight: string;
   };
   ai_detection: {
-    score: number;
     label: string;
     raw_prediction: string;
     raw_confidence: number;
     weight: string;
+  };
+  wikipedia: {
+    has_results: boolean;
+    articles: WikipediaArticle[];
+    search_terms: string;
   };
 }
 
@@ -61,6 +78,9 @@ export interface AnalysisResponse {
   verdict_color: string;
   evidence: EvidenceBreakdown;
   source?: SourceInfo;
+  explanation?: string;
+  evidence_analysis?: EvidenceAnalysis[];
+  engine?: 'gemini' | 'fallback';
 }
 
 export interface AnalysisError {

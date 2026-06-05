@@ -49,7 +49,7 @@ export default function Footer() {
               lineHeight: 1.9,
               maxWidth: '260px',
             }}>
-              An AI-powered truth engine trained to detect misinformation at scale. Powered by RoBERTa NLP and the Google Fact Check Tools API.
+              An AI-powered truth engine. Powered by Google Gemini AI, Google Fact Check, news search, and Wikipedia references.
             </p>
           </div>
 
@@ -106,7 +106,7 @@ export default function Footer() {
               Technology
             </span>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-              {['RoBERTa NLP Model', 'Google Fact Check API', 'FastAPI Backend', 'React + Vite Frontend'].map((tech) => (
+              {['Google Gemini AI', 'Google Fact Check API', 'FastAPI Backend', 'React + Vite Frontend'].map((tech) => (
                 <span key={tech} style={{
                   fontFamily: 'var(--font-mono)',
                   fontSize: '12px',
