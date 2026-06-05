@@ -44,7 +44,7 @@ export default function AnalyzerSection() {
     setShowSources(false);
 
     try {
-      const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:8000';
+      const apiUrl = import.meta.env.VITE_API_URL || 'https://verifact-ph-production.up.railway.app';
       const res = await fetch(`${apiUrl}/analyze`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
